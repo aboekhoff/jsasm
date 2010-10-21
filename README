@@ -28,8 +28,8 @@ enum     = [:ENUM token token tokens]
 The ast is rather awkward to write by hand, but makes a convenient
 compile target when emitting javascript
 
-For an example of a toy compiler with clojure-like syntax    
-that uses jsasm as a backend see Scrypt.
+For an example of a simple toy compiler with clojure-like syntax    
+that uses jsasm as a backend see Scrypt (coming soon ...).
 
 ## Installation
 
