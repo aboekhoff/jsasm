@@ -4,14 +4,14 @@ A Clojure tool for emitting JS
 
 ## Usage
 
-Token constructors live in jsasm.ast    
-'jsasm.ast/emit-tokens taken a sequence of tokens and returns      
+'jsasm.ast/emit-tokens takes a sequence of tokens and returns      
 a javascript string.
 
 The syntax of the ast is as follows:
 
 token    = lit | array | object | project | call | function |
-           if | while | enum
+           if | while | enum | throw | try | operator |
+           var | return | break
 tokens   = [token*]
 lit      = [:LIT (symbol | number | string)] 
 array    = [:ARRAY tokens]                 
@@ -25,11 +25,24 @@ if       = [:IF token tokens tokens?]
 while    = [:WHILE token tokens]              
 enum     = [:ENUM token token tokens]
 
-The ast is rather awkward to write by hand, but makes a convenient
-compile target when emitting javascript
+throw    = [:THROW token]
+catch    = [:CATCH token tokens]         
+finally  = [:FINALLY tokens]
+try      = [:TRY tokens catch finally?]
 
-For an example of a simple toy compiler with clojure-like syntax    
-that uses jsasm as a backend see Scrypt (coming soon ...).
+operator = [:OPERATOR symbol [token+]] ; =, +, <, ==
+var      = [:VAR tokens]
+return   = [:RETURN token]
+break    = [:BREAK]
+
+
+
+
+Some helpers for creating tokens live in jsasm.ast.
+
+The ast is awkward to write by hand, but is a convenient compile target.
+For an example of a simple compiler with clojure-like syntax    
+that uses jsasm as a backend see Scrypt.
 
 ## Installation
 

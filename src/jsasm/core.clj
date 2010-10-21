@@ -7,6 +7,7 @@
 
 (def *tab-width* 4)
 (def depth (atom 0))
+(defn reset-depth! (reset! depth 0))
 (defn indent! []
   (swap! depth + *tab-width*))
 (defn unindent! []
@@ -25,11 +26,6 @@
 (defn CM [] (write! ","))
 (defn TAB [] (dotimes [_ @depth] (SP)))
 
-(defn in-brackets* [action] (OB) (action) (CB))
-(defn in-parens* [action] (OP) (action) (CP))
-
-(defmacro in-brackets [& body]
-  `(do (OC) (indent!) (do ~@body) (unindent!) (TAB) (CC)))
 (defmacro in-brackets [& body]
   `(do (OB) (do ~@body) (CB)))
 (defmacro in-parens [& body]
@@ -46,10 +42,12 @@
 (defn comma-list [xs] (in-parens (commas xs)))
 
 (defn emit-body [tokens]
-  (OC) (indent!)
-  (doseq [t tokens]
-    (NL) (TAB) (emit! t) (SC))
-  (unindent!) (NL) (TAB) (CC))
+  (if (empty? tokens)
+    (write! "{;}")
+    (do (OC)
+        (indent!)
+        (doseq [t tokens] (NL) (TAB) (emit! t) (SC))
+        (unindent!) (NL) (TAB) (CC))))
 
 (defn if-token? [t] (= :IF (first t)))
 
@@ -70,15 +68,19 @@
     1 (in-parens (write! opsym) (SP) (emit! (first tokens)))
     (in-parens (separated-by opsym tokens))))
 
+(defn emit-literal [x]
+  (cond
+   (symbol? x) (write! (name x))
+   (string? x) (write! (pr-str x))
+   :else       (write! x)))
+
 (defn emit! [[tag a b c :as token]]
   (case tag
-    :IDENT    (write! a)
-    :STRING   (write! (pr-str a))
-    :NUMBER   (write! a)
+    :LIT      (emit-literal a)
     :REGEX    (regex-string a)
-    :ARRAY    (in-brackets (separated-by "," a))
+    :ARRAY    (in-brackets (commas a))
     :ENTRY    (emit-entry a b)
-    :OBJECT   (in-braces (separated-by "," a))
+    :OBJECT   (in-brackets (commas a))
     :PROJECT  (do (emit! a) (in-brackets (emit! b)))
     :CALL     (do (emit! a) (comma-list b))
     :FUNCTION (in-parens (write! "function ")
@@ -94,10 +96,14 @@
                   (SP)
                   (emit-body c))
     :IF       (emit-if a b c)
-    :OPERATOR (in-parens (separated-by a b))))
+    :OPERATOR (in-parens (separated-by a b))
+    :BREAK    (write! "break")
+    :RETURN   (do (write! "return ") (emit! a))
+    :VAR      (do (write! "var ") (commas b))))
 
 (defn emit-tokens [tokens]
   (clear!)
+  (reset-depth!)
   (doseq [t tokens] (emit! t))
   (str accumulator))
 

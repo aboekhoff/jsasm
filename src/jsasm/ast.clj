@@ -1,16 +1,16 @@
 (ns jsasm.ast)
 
-(defmacro defnode [tag]
+(defmacro deftoken [tag]
   `(defn ~tag [& vals#]
      (->> vals#
           (cons ~(keyword tag))
           vec)))
 
-(defmacro defnodes [& tags]
+(defmacro deftokens [& tags]
   `(do ~@(for [t tags]
            `(defnode ~t))))
 
-(defnodes
+(deftokens
   LIT
   REGEX
   ARRAY
@@ -29,8 +29,7 @@
   TRY
   THROW
   CATCH
-  FINALLY
-  DELETE)
+  FINALLY)
 
 
 
