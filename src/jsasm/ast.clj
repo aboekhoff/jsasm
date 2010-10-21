@@ -11,9 +11,7 @@
            `(defnode ~t))))
 
 (defnodes
-  IDENT
-  STRING
-  NUMBER
+  LIT
   REGEX
   ARRAY
   OBJECT

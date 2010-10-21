@@ -1,14 +1,39 @@
 # jsasm
 
-FIXME: write description
+A Clojure tool for emitting JS
 
 ## Usage
 
-FIXME: write
+Token constructors live in jsasm.ast    
+'jsasm.ast/emit-tokens taken a sequence of tokens and returns      
+a javascript string.
+
+The syntax of the ast is as follows:
+
+token    = lit | array | object | project | call | function |
+           if | while | enum
+tokens   = [token*]
+lit      = [:LIT (symbol | number | string)] 
+array    = [:ARRAY tokens]                 
+entry    = [:ENTRY token token]               ; foo : bar
+entries  = [entry*]
+object   = [:OBJECT entries]                  ; { foo : bar, ... }
+function = [:FUNCTION tokens tokens]          ; function ( ... ) { ... } 
+project  = [:PROJECT token token]             ; foo[bar]
+call     = [:CALL tokens]                     ; foo(...) { ... }
+if       = [:IF token tokens tokens?]
+while    = [:WHILE token tokens]              
+enum     = [:ENUM token token tokens]
+
+The ast is rather awkward to write by hand, but makes a convenient
+compile target when emitting javascript
+
+For an example of a toy compiler with clojure-like syntax    
+that uses jsasm as a backend see Scrypt.
 
 ## Installation
 
-FIXME: write
+;;;;
 
 ## License
 
