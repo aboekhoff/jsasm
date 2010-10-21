@@ -7,8 +7,7 @@
           vec)))
 
 (defmacro deftokens [& tags]
-  `(do ~@(for [t tags]
-           `(defnode ~t))))
+  `(do ~@(for [t tags] `(deftoken ~t))))
 
 (deftokens
   LIT
