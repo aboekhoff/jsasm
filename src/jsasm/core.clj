@@ -5,7 +5,7 @@
 (defn write! [x] (.append accumulator x))
 (defn clear! []  (.setLength accumulator 0))
 
-(def *tab-width* 4)
+(def *tab-width* 2)
 (def depth (atom 0))
 (defn reset-depth! [] (reset! depth 0))
 (defn indent! []
@@ -60,8 +60,9 @@
   (emit-body then)
   (when else
     (write! " else ")
-    (if (if-token? else)
-      (emit else)
+    (if (and (if-token? (first else))
+             (= 1 (count else)))
+      (emit (first else))
       (emit-body else))))
 
 (defn emit-operator [opsym tokens]
@@ -72,6 +73,7 @@
 
 (defn emit-literal [x]
   (cond
+   (nil? x)    (write! "null")
    (symbol? x) (write! (name x))
    (string? x) (write! (pr-str x))
    :else       (write! x)))
@@ -85,10 +87,11 @@
     :OBJECT   (in-brackets (commas a))
     :PROJECT  (do (emit a) (in-brackets (emit b)))
     :CALL     (do (emit a) (comma-list b))
-    :FUNCTION (in-parens (write! "function ")
-                         (comma-list a)
-                         (SP)
-                         (emit-body b))
+    :FUNCTION (in-parens
+               (write! "function ")
+               (comma-list a)
+               (SP)
+               (emit-body b))
     :WHILE    (do (write! "while ")
                   (in-parens (emit a))
                   (SP)
@@ -98,10 +101,12 @@
                   (SP)
                   (emit-body c))
     :IF       (emit-if a b c)
+    :SET!     (do (emit a) (write! " = ") (emit b))
     :OPERATOR (in-parens (separated-by a b))
     :BREAK    (write! "break")
     :RETURN   (do (write! "return ") (emit a))
-    :VAR      (do (write! "var ") (commas b))))
+    :VAR      (do (write! "var ") (commas a))
+    :NEW      (do (write! "new ") (emit a))))
 
 (defn emit-tokens [tokens]
   (clear!)

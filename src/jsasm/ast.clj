@@ -20,6 +20,7 @@
   CALL
   IF
   WHILE
+  SET!
   OPERATOR
   BREAK
   RETURN
