@@ -9,35 +9,33 @@ a javascript string.
 
 The syntax of the ast is as follows:
 
-token    = lit | array | object | project | call | function |
-           if | while | enum | throw | try | operator |
-           var | return | break
-tokens   = [token*]
-lit      = [:LIT (symbol | number | string)] 
-array    = [:ARRAY tokens]                 
-entry    = [:ENTRY token token]               ; foo : bar
-entries  = [entry*]
-object   = [:OBJECT entries]                  ; { foo : bar, ... }
-function = [:FUNCTION tokens tokens]          ; function ( ... ) { ... } 
-project  = [:PROJECT token token]             ; foo[bar]
-call     = [:CALL tokens]                     ; foo(...) { ... }
-if       = [:IF token tokens tokens?]
-while    = [:WHILE token tokens]              
-enum     = [:ENUM token token tokens]
-
-throw    = [:THROW token]
-catch    = [:CATCH token tokens]         
-finally  = [:FINALLY tokens]
-try      = [:TRY tokens catch finally?]
-
-operator = [:OPERATOR symbol [token+]] ; =, +, <, ==
-var      = [:VAR tokens]
-return   = [:RETURN token]
-break    = [:BREAK]
-
-
-
-
+    token    = lit | array | object | project | call | function |        
+               if | while | enum | throw | try | operator |      
+               var | return | break    
+    tokens   = [token*]    
+    lit      = [:LIT (symbol | number | string)]     
+    array    = [:ARRAY tokens]     
+    entry    = [:ENTRY token token]               ; foo : bar    
+    entries  = [entry*]    
+    object   = [:OBJECT entries]                  ; { foo : bar, ... }    
+    function = [:FUNCTION tokens tokens]          ; function ( ... ) { ... }     
+    project  = [:PROJECT token token]             ; foo[bar]    
+    call     = [:CALL tokens]                     ; foo(...) { ... }    
+    if       = [:IF token tokens tokens?]    
+    while    = [:WHILE token tokens]                  
+    enum     = [:ENUM token token tokens]    
+        
+    throw    = [:THROW token]    
+    catch    = [:CATCH token tokens]             
+    finally  = [:FINALLY tokens]    
+    try      = [:TRY tokens catch finally?]    
+        
+    operator = [:OPERATOR symbol [token+]] ; =, +, <, ==    
+    var      = [:VAR tokens]    
+    return   = [:RETURN token]    
+    break    = [:BREAK]    
+    
+        
 Some helpers for creating tokens live in jsasm.ast.
 
 The ast is awkward to write by hand, but is a convenient compile target.
