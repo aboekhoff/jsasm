@@ -1,3 +1,11 @@
+;   Copyright (c) Andrew Boekhoff. All rights reserved.
+;   The use and distribution terms for this software are covered by the
+;   Eclipse Public License 1.0 (http://opensource.org/licenses/eclipse-1.0.php)
+;   which can be found in the file epl-v10.html at the root of this distribution.
+;   By using this software in any fashion, you are agreeing to be bound by
+;   the terms of this license.
+;   You must not remove this notice, or any other, from this software.
+
 (ns jsasm.core
   (:require [clojure.string :as str]))
 
@@ -69,7 +77,7 @@
   (case (count tokens)
     0 (throw (Exception. (str "empty arglist for operator " opsym)))
     1 (in-parens (write! opsym) (SP) (emit (first tokens)))
-    (in-parens (separated-by opsym tokens))))
+    (in-parens (separated-by (str " " opsym " ") tokens))))
 
 (defn emit-literal [x]
   (cond
@@ -102,7 +110,7 @@
                   (emit-body c))
     :IF       (emit-if a b c)
     :SET!     (do (emit a) (write! " = ") (emit b))
-    :OPERATOR (in-parens (separated-by a b))
+    :OPERATOR (emit-operator a b) 
     :BREAK    (write! "break")
     :RETURN   (do (write! "return ") (emit a))
     :VAR      (do (write! "var ") (commas a))

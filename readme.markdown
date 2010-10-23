@@ -40,14 +40,14 @@ Some helpers for creating tokens live in jsasm.ast.
 
 The ast is awkward to write by hand, but is a convenient compile target.
 For an example of a simple compiler with clojure-like syntax    
-that uses jsasm as a backend see Scrypt.
+that uses jsasm as a backend see Calliope.
 
 ## Installation
 
-;;;;
+[jsasm "1.0.0-SNAPSHOT"]
 
 ## License
 
-Copyright (C) 2010 FIXME
+Copyright (C) 2010 Andrew Boekhoff
 
 Distributed under the Eclipse Public License, the same as Clojure.
