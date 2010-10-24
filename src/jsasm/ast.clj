@@ -35,9 +35,12 @@
   VAR
   NEW
   TRY
+  TRY*
   THROW
   CATCH
-  FINALLY)
+  FINALLY
+  ENUM
+  COMMENT)
 
 
 

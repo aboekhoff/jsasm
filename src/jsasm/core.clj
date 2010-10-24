@@ -34,10 +34,12 @@
 (defn CM [] (write! ","))
 (defn TAB [] (dotimes [_ @depth] (SP)))
 
+(defmacro in-braces [& body]
+  `(do (OC) (indent!) ~@body (unindent!) (NL) (TAB) (CC)))
 (defmacro in-brackets [& body]
-  `(do (OB) (do ~@body) (CB)))
+  `(do (OB) ~@body (CB)))
 (defmacro in-parens [& body]
-  `(do (OP) (do ~@body) (CP)))
+  `(do (OP) ~@body (CP)))
 
 (declare emit)
 
@@ -47,17 +49,19 @@
     (doseq [token (rest tokens)] (write! sep) (emit token))))
 
 (defn commas [tokens] (separated-by ", " tokens))
-(defn emit-regex [s] (write! "/") (write! s) (write! "/"))
-(defn emit-entry [k v] (NL) (TAB) (emit k) (CL) (SP) (emit v))
 (defn comma-list [xs] (in-parens (commas xs)))
+(defn emit-regex [s] (write! "/") (write! s) (write! "/"))
+
+(defn emit-entry [k v] (NL) (TAB) (emit k) (CL) (SP) (emit v))
+(defn emit-object [entries]
+  (if (empty? entries)
+    (write! "{}")
+    (in-braces (separated-by "," entries))))
 
 (defn emit-body [tokens]
   (if (empty? tokens)
     (write! "{;}")
-    (do (OC)
-        (indent!)
-        (doseq [t tokens] (NL) (TAB) (emit t) (SC))
-        (unindent!) (NL) (TAB) (CC))))
+    (in-braces (doseq [t tokens] (NL) (TAB) (emit t) (SC)))))
 
 (defn if-token? [t] (= :IF (first t)))
 
@@ -86,13 +90,24 @@
    (string? x) (write! (pr-str x))
    :else       (write! x)))
 
-(defn emit [[tag a b c :as token]]
+(defn emit-try-catch [t v c & [f]]
+  (write! "try ")
+  (emit-body t)
+  (write! " catch (")
+  (emit v)
+  (write! ") ")
+  (emit-body c)
+  (when f
+    (write! " finally ")
+    (emit-body f)))
+
+(defn emit [[tag a b c d :as token]]
   (case tag
     :LIT      (emit-literal a)
     :REGEX    (do (write! "/") (emit a) (write! "/"))
     :ARRAY    (in-brackets (commas a))
     :ENTRY    (emit-entry a b)
-    :OBJECT   (in-brackets (commas a))
+    :OBJECT   (emit-object a)
     :PROJECT  (do (emit a) (in-brackets (emit b)))
     :CALL     (do (emit a) (comma-list b))
     :FUNCTION (in-parens
@@ -114,7 +129,9 @@
     :BREAK    (write! "break")
     :RETURN   (do (write! "return ") (emit a))
     :VAR      (do (write! "var ") (commas a))
-    :NEW      (do (write! "new ") (emit a))))
+    :NEW      (do (write! "new ") (emit a))
+    :TRY      (emit-try-catch a b c)
+    :TRY*     (emit-try-catch a b c d)))
 
 (defn emit-tokens [tokens]
   (clear!)
