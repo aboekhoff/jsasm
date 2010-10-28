@@ -61,7 +61,16 @@
 (defn emit-body [tokens]
   (if (empty? tokens)
     (write! "{;}")
-    (in-braces (doseq [t tokens] (NL) (TAB) (emit t) (SC)))))
+    (in-braces (doseq [t tokens]
+                 (NL)
+                 (TAB)
+                 (emit t)
+                 (when-not (= :COMMENT (first t))
+                   (SC))))))
+
+(defn emit-body* [tokens]
+  (doseq [t tokens]
+    (emit t) (SC) (NL)))
 
 (defn if-token? [t] (= :IF (first t)))
 
@@ -131,7 +140,10 @@
     :VAR      (do (write! "var ") (commas a))
     :NEW      (do (write! "new ") (emit a))
     :TRY      (emit-try-catch a b c)
-    :TRY*     (emit-try-catch a b c d)))
+    :TRY*     (emit-try-catch a b c d)
+    :COMMENT  (do (write! "\n/* ")
+                  (write! a)
+                  (write! " */\n"))))
 
 (defn emit-tokens [tokens]
   (clear!)
