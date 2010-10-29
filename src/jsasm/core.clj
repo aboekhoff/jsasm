@@ -141,6 +141,8 @@
     :NEW      (do (write! "new ") (emit a))
     :TRY      (emit-try-catch a b c)
     :TRY*     (emit-try-catch a b c d)
+    :THROW    (do (write! "throw ")
+                  (emit a))
     :COMMENT  (do (write! "\n/* ")
                   (write! a)
                   (write! " */\n"))))
