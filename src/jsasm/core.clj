@@ -153,4 +153,8 @@
   (doseq [t tokens] (emit t))
   (str accumulator))
 
-(defn emit-tokens* [& tokens] (emit-tokens tokens))
+(defn emit-tokens* [tokens]
+  (clear!)
+  (reset-depth!)
+  (emit-body* tokens)
+  (str accumulator))
